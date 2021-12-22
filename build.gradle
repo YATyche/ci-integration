@@ -1,0 +1,45 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.1'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'application'
+}
+
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+
+configurations {
+    ddTracerAgent
+}
+
+dependencies {
+	ddTracerAgent "com.datadoghq:dd-java-agent:0.92.0"
+
+	implementation 'com.datadoghq:dd-trace-api:0.92.0'
+	implementation 'com.datadoghq:dd-trace-ot:0.92.0'
+
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
+}
+
+test {
+    if(project.hasProperty("dd-civisibility")) {
+			jvmArgs = [
+					"-javaagent:${configurations.ddTracerAgent.asPath}",
+					"-Ddd.service=ci-integration",
+					"-Ddd.civisibility.enabled=true"
+			]
+  }
+  useJUnitPlatform()
+}
+
+application {
+    mainClass = 'com.example.springboot.Application'
+}
