@@ -11,7 +11,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
       - restore_cache:
           key: v1-gradle-cache-{{ checksum "build.gradle" }}
       - datadog-agent/setup
@@ -19,8 +19,8 @@ jobs:
       - datadog-agent/stop
       - save_cache:
           paths:
-            - ~/.gradle/wrapper
-          key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+            - ~/.gradle/7.3.2
+          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
       - save_cache:
           paths:
             - ~/.gradle/caches
@@ -33,7 +33,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
       - restore_cache:
           key: v1-gradle-cache-{{ checksum "build.gradle" }}
       - run: ./gradlew assemble
@@ -44,11 +44,11 @@ jobs:
           TAG=0.1.$CIRCLE_BUILD_NUM
           
           npx @datadog/datadog-ci git-metadata upload
-          docker build -t yaalexf/spring-boot-app --build-arg VERSION=${TAG} --build-arg GIT_COMMIT_SHA=${GIT_COMMIT_SHA} .
+          docker build -t yaalexf/ci-integration --build-arg VERSION=${TAG} --build-arg GIT_COMMIT_SHA=${GIT_COMMIT_SHA} .
           echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-          docker push yaalexf/spring-boot-app
+          docker push yaalexf/ci-integration
 workflows:
-  spring-boot-app-workflow:
+  ci-integration-workflow:
     jobs:
       - test
       - build:
