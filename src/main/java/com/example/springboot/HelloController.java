@@ -26,23 +26,7 @@ public class HelloController {
 
 	@GetMapping("/boom")
 	public String boom() {
-		solve();
+		System.out.println(5 / 0);
 		return "";
 	}
-
-	private void solve() {
-		Tracer tracer = GlobalTracer.get();
-		Span span = tracer.buildSpan("Solve puzzle")
-				.withTag(DDTags.SERVICE_NAME, "puzzle-solver")
-				.withTag(DDTags.RESOURCE_NAME, "solver")
-				.start();
-		try (Scope scope = tracer.activateSpan(span)) {
-			System.out.println(5 / 0);
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			span.finish();
-		}
-	}
-
 }
